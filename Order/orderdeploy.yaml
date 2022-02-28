@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+spec:
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+      - name: order
+        image: txcai/orders:2.0
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+          - name: RABBITMQHOST
+            value: rabbitmq           
+          - name: RABBITMQPORT
+            value: "5672"   
+          - name: RABBITUSER
+            value: guest           
+          - name: RABBITPASSWORD
+            value: "guest"   
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+spec:
+  type: NodePort
+  selector:
+    app: order
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 32281
+
